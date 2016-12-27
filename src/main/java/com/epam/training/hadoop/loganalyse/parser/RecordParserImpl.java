@@ -5,6 +5,8 @@ import com.epam.training.hadoop.loganalyse.domain.LogRecord;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -16,6 +18,8 @@ import org.joda.time.format.DateTimeFormatter;
 */
 
 public class RecordParserImpl implements RecordParser {
+
+    private final static Logger logger = Logger.getLogger(RecordParserImpl.class);
 
     private final static String EMPTY_RECORD = "";
     private final static Pattern VALID_RECORD = Pattern.compile("(ip\\d+)\\s(.+)\\s(\\[(.+)\\s(.+)\\])\\s(\\\"(\\w+)\\s(\\/.+)\\s(.+)\\\")\\s(\\d+)\\s(\\d+)\\s(\\\"(.+)\\\")\\s(\\\"(.+)\\\")");
@@ -49,7 +53,7 @@ public class RecordParserImpl implements RecordParser {
     @Override
     public LogRecord parseRecord(String record) {
         if (!isValid(record)) {
-            System.err.println("invalid record: \n" + record);
+            logger.error("invalid record: \n" + record);
             return null;
         }
         LogRecord logRecord = new LogRecord();
@@ -60,8 +64,7 @@ public class RecordParserImpl implements RecordParser {
             DateTime dateTime = DateTime.parse(matcher.group(4), DATE_TIME_FORMATTER).withZoneRetainFields(DateTimeZone.forID(matcher.group(5)));
             logRecord.setDateTime(dateTime);
         } catch (RuntimeException e) {
-            System.err.println("failed to parse datetime of the record: \n" + record);
-            e.printStackTrace(System.err);
+            logger.error("failed to parse datetime of the record: \n" + record, e);
         }
         logRecord.setMethodName(matcher.group(7));
         logRecord.setLocalLink(matcher.group(8));
