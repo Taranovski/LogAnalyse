@@ -49,13 +49,20 @@ public class RecordParserImpl implements RecordParser {
     @Override
     public LogRecord parseRecord(String record) {
         if (!isValid(record)) {
+            System.err.println("invalid record: \n" + record);
             return null;
         }
         LogRecord logRecord = new LogRecord();
 
         logRecord.setIp(matcher.group(1));
         logRecord.setSomeUnknownFields1(matcher.group(2));
-        logRecord.setDateTime(DateTime.parse(matcher.group(4), DATE_TIME_FORMATTER).withZoneRetainFields(DateTimeZone.forID(matcher.group(5))));
+        try {
+            DateTime dateTime = DateTime.parse(matcher.group(4), DATE_TIME_FORMATTER).withZoneRetainFields(DateTimeZone.forID(matcher.group(5)));
+            logRecord.setDateTime(dateTime);
+        } catch (RuntimeException e) {
+            System.err.println("failed to parse datetime of the record: \n" + record);
+            e.printStackTrace(System.err);
+        }
         logRecord.setMethodName(matcher.group(7));
         logRecord.setLocalLink(matcher.group(8));
         logRecord.setProtocolName(matcher.group(9));
