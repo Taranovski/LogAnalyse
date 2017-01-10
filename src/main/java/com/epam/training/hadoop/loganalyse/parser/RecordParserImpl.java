@@ -21,10 +21,10 @@ public class RecordParserImpl implements RecordParser {
 
     private final static Logger logger = Logger.getLogger(RecordParserImpl.class);
 
-    private final static String EMPTY_RECORD = "";
-    private final static Pattern VALID_RECORD = Pattern.compile("(ip\\d+)\\s(.+)\\s(\\[(.+)\\s(.+)\\])\\s(\\\"(\\w+)\\s(\\/.+)\\s(.+)\\\")\\s(\\d+)\\s(\\d+)\\s(\\\"(.+)\\\")\\s(\\\"(.+)\\\")");
-    private static Matcher matcher;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+    private final String EMPTY_RECORD = "";
+    private final Pattern VALID_RECORD = Pattern.compile("(ip\\d+)\\s(.+)\\s(\\[(.+)\\s(.+)\\])\\s(\\\"(\\w+)\\s(\\/.+)\\s(.+)\\\")\\s(\\d+)\\s(\\d+)\\s(\\\"(.+)\\\")\\s(\\\"(.+)\\\")");
+    private Matcher matcher;
+    private final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormat.forPattern("dd/MMM/yyyy:HH:mm:ss").withLocale(Locale.ENGLISH);
 
     @Override
@@ -41,6 +41,7 @@ public class RecordParserImpl implements RecordParser {
             try {
                 DateTime.parse(matcher.group(4), DATE_TIME_FORMATTER);
             } catch (RuntimeException e) {
+
                 return false;
             }
         } else {
