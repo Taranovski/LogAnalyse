@@ -37,11 +37,13 @@ public class RecordParserImpl implements RecordParser {
             return false;
         }
         matcher = VALID_RECORD.matcher(record);
+        String group = null;
         if (matcher.find()) {
             try {
-                DateTime.parse(matcher.group(4), DATE_TIME_FORMATTER);
+                group = matcher.group(4);
+                DateTime.parse(group, DATE_TIME_FORMATTER);
             } catch (RuntimeException e) {
-
+                logger.error("failed to parse datetime group [" + group + "] of the record: \n" + record, e);
                 return false;
             }
         } else {
@@ -61,11 +63,13 @@ public class RecordParserImpl implements RecordParser {
 
         logRecord.setIp(matcher.group(1));
         logRecord.setSomeUnknownFields1(matcher.group(2));
+        String group = null;
         try {
-            DateTime dateTime = DateTime.parse(matcher.group(4), DATE_TIME_FORMATTER).withZoneRetainFields(DateTimeZone.forID(matcher.group(5)));
+            group = matcher.group(4);
+            DateTime dateTime = DateTime.parse(group, DATE_TIME_FORMATTER).withZoneRetainFields(DateTimeZone.forID(matcher.group(5)));
             logRecord.setDateTime(dateTime);
         } catch (RuntimeException e) {
-            logger.error("failed to parse datetime of the record: \n" + record, e);
+            logger.error("failed to parse datetime group [" + group + "] of the record: \n" + record, e);
         }
         logRecord.setMethodName(matcher.group(7));
         logRecord.setLocalLink(matcher.group(8));
